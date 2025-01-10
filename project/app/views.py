@@ -9,9 +9,15 @@ class LandingPageView(View):
         bag_count = sum(donation.quantity for donation in Donation.objects.all())
         supported_institutions = sum(1 for institution in Institution.objects.all() if institution.donation_set.all().count() > 0)
 
+        foundations = [foundation for foundation in Institution.objects.filter(type='0')]
+        organizations = [organization for organization in Institution.objects.filter(type='1')]
+        local_collections = [collection for collection in Institution.objects.filter(type='2')]
         ctx = {
             'bag_count': bag_count,
             'supported_institutions': supported_institutions,
+            'foundations': foundations,
+            'organizations': organizations,
+            'local_collections': local_collections,
         }
         return render(request, 'app/index.html', ctx)
 
