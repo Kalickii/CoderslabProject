@@ -1,5 +1,6 @@
 from django.views import View
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 
 from app.models import Donation, Institution, User
 
@@ -31,6 +32,17 @@ class LoginView(View):
     def get(self, request):
         return render(request, 'app/login.html')
 
+    def post(self, request):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        if email and password:
+            user = authenticate(email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('landing-page')
+            return redirect('register')
+        return render(request, 'app/login.html')
+
 
 class RegisterView(View):
     def get(self, request):
@@ -48,3 +60,11 @@ class RegisterView(View):
         else:
             message = 'Proszę wypełnić wszystkie pola, hasło musi być takie same oraz adres email może zostać użyty tylko raz.'
             return render(request, 'app/register.html', {'message': message})
+
+
+def logout_view(request):
+    user = request.user
+    if user.is_authenticated:
+        logout(request)
+        return redirect('landing-page')
+    return redirect('login')
