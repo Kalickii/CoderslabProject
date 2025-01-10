@@ -1,7 +1,7 @@
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-from app.models import Donation, Institution
+from app.models import Donation, Institution, User
 
 
 class LandingPageView(View):
@@ -35,3 +35,16 @@ class LoginView(View):
 class RegisterView(View):
     def get(self, request):
         return render(request, 'app/register.html')
+
+    def post(self, request):
+        name = request.POST.get('name')
+        surname = request.POST.get('surname')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        if name and surname and email and password and password2 and (password == password2) and (User.objects.filter(email=email).exists() is False):
+            User.objects.create_user(first_name=name, last_name=surname, email=email, password=password)
+            return redirect('login')
+        else:
+            message = 'Proszę wypełnić wszystkie pola, hasło musi być takie same oraz adres email może zostać użyty tylko raz.'
+            return render(request, 'app/register.html', {'message': message})
