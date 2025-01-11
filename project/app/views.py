@@ -1,8 +1,9 @@
 from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from app.models import Donation, Institution, User
+from app.models import Category, Donation, Institution, User
 
 
 class LandingPageView(View):
@@ -23,9 +24,15 @@ class LandingPageView(View):
         return render(request, 'app/index.html', ctx)
 
 
-class AddDonationView(View):
+class AddDonationView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'app/form.html')
+        categories = Category.objects.all()
+        institutions = Institution.objects.all()
+        ctx = {
+            'categories': categories,
+            'institutions': institutions,
+        }
+        return render(request, 'app/form.html', ctx)
 
 
 class LoginView(View):
