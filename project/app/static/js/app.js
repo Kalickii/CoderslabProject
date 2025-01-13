@@ -253,3 +253,45 @@ document.addEventListener("DOMContentLoaded", function() {
     new FormSteps(form);
   }
 });
+
+const donationForm = document.getElementById('donationForm')
+const step4NextButton = document.getElementById('summaryButton')
+
+step4NextButton.addEventListener("click", (e) => {
+  e.preventDefault()
+  const formData = new FormData(donationForm);
+
+  const bagsSum = document.getElementById('bagsSum')
+  const organizationSum = document.getElementById('organizationSum')
+  const addressSum = document.getElementById('addressSum')
+  const citySum = document.getElementById('citySum')
+  const postcodeSum = document.getElementById('postcodeSum')
+  const phoneSum = document.getElementById('phoneSum')
+  const dateSum = document.getElementById('dateSum')
+  const timeSum = document.getElementById('timeSum')
+  const commentSum = document.getElementById('commentSum')
+  const formFields = [bagsSum, organizationSum, addressSum, citySum, postcodeSum, phoneSum, dateSum, timeSum, commentSum]
+
+
+  for (item of formData) {
+    // console.log(item[0])
+    formFields.forEach(e => {
+      // console.log(e.id);
+      if (item[0] === e.id) {
+        if (item[0] === 'bagsSum') {
+          e.innerHTML = item[1] + ' worków';
+          return;
+        }
+        if (item[0] === 'organizationSum'){
+          e.innerHTML = 'Dla ' + item[1];
+          return;
+        }
+        else {
+          if (item[1] !== '') {
+            e.innerText = item[1]
+          }
+        }
+      }
+    });
+  }
+})
