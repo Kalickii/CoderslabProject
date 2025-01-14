@@ -118,5 +118,13 @@ def donation_confirm_view(request):
 
 class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'app/profile.html', {'donations': Donation.objects.filter(user=self.request.user)})
+        return render(request, 'app/profile.html', {'donations': Donation.objects.filter(user=self.request.user).order_by('is_taken')})
 
+
+    def post(self, request):
+        donations_to_update = request.POST.getlist('not_taken')
+        for i in donations_to_update:
+            donation = Donation.objects.get(pk=i)
+            donation.is_taken = True
+            donation.save()
+        return render(request, 'app/profile.html', {'donations': Donation.objects.filter(user=self.request.user).order_by('is_taken')})

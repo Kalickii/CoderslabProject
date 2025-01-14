@@ -254,6 +254,23 @@ document.addEventListener("DOMContentLoaded", function() {
   if (form !== null) {
     new FormSteps(form);
   }
+
+const checkboxesTaken = Array.from(document.getElementsByClassName('archive-checkbox'))
+const archiveCheckboxSwitch = document.getElementById('archive')
+
+  archiveCheckboxSwitch.addEventListener('change', function (){
+  if (archiveCheckboxSwitch.checked){
+    checkboxesTaken.forEach(e => {
+      e.style.display = 'block'
+    })
+  }
+  else{
+    checkboxesTaken.forEach(e => {
+      e.style.display = 'none'
+    })
+  }
+})
+
 });
 
 const donationForm = document.getElementById('donationForm')

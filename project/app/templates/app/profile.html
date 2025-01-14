@@ -12,6 +12,8 @@
         <p>Adres email: {{ user.email }}</p>
     </div>
     <div>
+    <form action="" method="post">
+    {% csrf_token %}
         <h3>Przekazane dary:</h3>
         <ul>
             {% for donation in donations %}
@@ -26,8 +28,20 @@
                         {% endfor %}
                     </p>
                     <p>Data odbioru: {{ donation.pick_up_date }} {{ donation.pick_up_time }}</p>
+                    {% if not donation.is_taken %}
+                    <label>
+                        <input type="checkbox" class="archive-checkbox" style="display: none" name="not_taken" value="{{ donation.pk }}">
+                    </label>
+                    {% else %}
+                        <p>>>> ZARCHIWIZOWANE <<<</p>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
+        <label>
+            <input type="checkbox" id="archive" value="0">
+            <button type="submit">ARCHIWIZUJ</button>
+        </label>
+    </form>
     </div>
 {% endblock %}
