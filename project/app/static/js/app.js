@@ -295,3 +295,78 @@ step4NextButton.addEventListener("click", (e) => {
     });
   }
 })
+
+// STEP 1
+const checkbox1 = Array.from(document.getElementsByClassName('checkbox1'))
+const button1 = document.getElementById('button1')
+let counter = 0
+
+checkbox1.forEach(e => {
+  e.addEventListener('change', function (){
+    if (e.checked){
+      counter += 1
+      if (counter > 0){
+        button1.style['display'] = 'block'
+      }
+    }
+    else {
+      counter -= 1
+      if (counter === 0){
+        button1.style['display'] = 'none'
+      }
+    }
+  })
+})
+
+// STEP 2
+
+const inputBags = document.getElementById('bagsInput')
+const button2 = document.getElementById('button2')
+
+inputBags.addEventListener('input', function (){
+  if (inputBags.value !== '' && parseInt(inputBags.value) !== 0){
+    button2.style['display'] = 'block'
+  }
+  else{
+    button2.style['display'] = 'none'
+  }
+})
+
+// STEP 3
+
+const checkbox2 = Array.from(document.getElementsByClassName('checkbox2'))
+const button3 = document.getElementById('button3')
+
+checkbox2.forEach(e => {
+  e.addEventListener('change', function (){
+    if (e.checked){
+        button3.style['display'] = 'block'
+      }
+    }
+  )})
+
+// STEP 4
+
+const button4 = document.getElementById('summaryButton')
+
+const address = document.querySelector('[name="addressSum"]')
+const city = document.querySelector('[name="citySum"]')
+const postcode = document.querySelector('[name="postcodeSum"]')
+const phone = document.querySelector('[name="phoneSum"]')
+const date = document.querySelector('[name="dateSum"]')
+const time = document.querySelector('[name="timeSum"]')
+
+const fields = [address, city, postcode, phone, date, time]
+
+fields.forEach(function (e){
+  e.addEventListener('change', function (){
+    const allFilled = fields.every(f => f.value.trim() !== '')
+
+    if (allFilled) {
+      button4.style.display = 'block'
+    }
+    else {
+      button4.style.display = 'none'
+    }
+  })
+})
