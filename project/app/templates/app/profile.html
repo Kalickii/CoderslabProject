@@ -1,0 +1,33 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block content %}
+{% block header %}
+    <header>
+        {{ block.super }}
+    </header>
+{% endblock %}
+    <div>
+        <p>Imię: {{ user.first_name }}</p>
+        <p>Nazwisko: {{ user.last_name }}</p>
+        <p>Adres email: {{ user.email }}</p>
+    </div>
+    <div>
+        <h3>Przekazane dary:</h3>
+        <ul>
+            {% for donation in donations %}
+                <h4>Donation:</h4>
+                <li>
+                    <p>Worki: {{ donation.quantity }}</p>
+                    <p>{{ donation.institution }}</p>
+                    <p>
+                        Kategorie:
+                        {% for category in donation.categories.all %}
+                            {{ category.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p>Data odbioru: {{ donation.pick_up_date }} {{ donation.pick_up_time }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

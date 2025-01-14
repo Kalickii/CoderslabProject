@@ -114,3 +114,9 @@ def logout_view(request):
 @login_required(login_url='login')
 def donation_confirm_view(request):
     return render(request, 'app/form-confirmation.html')
+
+
+class ProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'app/profile.html', {'donations': Donation.objects.filter(user=self.request.user)})
+

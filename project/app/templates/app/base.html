@@ -21,7 +21,7 @@
             Witaj {{ user.first_name }}
             <ul class="dropdown">
               {% if user.is_superuser %}<li><a href="admin/">Panel Administracyjny</a></li>{% endif %}
-              <li><a href="#">Profil</a></li>
+              <li><a href="{% url 'profile' %}">Profil</a></li>
               <li><a href="#">Moje zbiórki</a></li>
               <li><a href="{% url 'logout' %}">Wyloguj</a></li>
             </ul>
