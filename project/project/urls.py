@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.LandingPageView.as_view(), name='landing-page'),
     path('donation/', views.AddDonationView.as_view(), name='add-donation'),
+    path('donation-confirm/', views.donation_confirm_view, name='add-donation-confirm'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('register/', views.RegisterView.as_view(), name='register'),
     path('logout/', views.logout_view, name='logout'),
