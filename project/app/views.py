@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 
 from app.models import Category, Donation, Institution, User
 
@@ -128,3 +129,37 @@ class ProfileView(LoginRequiredMixin, View):
             donation.is_taken = True
             donation.save()
         return render(request, 'app/profile.html', {'donations': Donation.objects.filter(user=self.request.user).order_by('is_taken')})
+
+
+class SettingsView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'app/settings.html')
+
+
+    def post(self, request):
+        if 'button1' in request.POST:
+            user = request.user
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            if check_password(password, user.password):
+                user.first_name = first_name
+                user.last_name = last_name
+                user.email = email
+                user.save()
+                return render(request, 'app/settings.html')
+            return render(request, 'app/settings.html', {'message1': 'Niepoprawne hasło'})
+
+        elif 'button2' in request.POST:
+            user = request.user
+            old_password = request.POST.get('old_pass')
+            new_password1 = request.POST.get('new_pass1')
+            new_password2 = request.POST.get('new_pass2')
+            if check_password(old_password, user.password):
+                if new_password1 == new_password2:
+                    user.set_password(new_password1)
+                    user.save()
+                    return redirect('login')
+                return render(request, 'app/settings.html', {'message2': 'Hasła różnią się od siebie'})
+            return render(request, 'app/settings.html', {'message2': 'Niepoprawne hasło'})
