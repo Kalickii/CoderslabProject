@@ -196,8 +196,45 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$next.forEach(btn => {
         btn.addEventListener("click", e => {
           e.preventDefault();
-          this.currentStep++;
-          this.updateForm();
+          const active = document.querySelector('div.active')
+          if (this.currentStep === 1){
+            const checkboxes = active.querySelectorAll('[name="categories"]')
+            const isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked)
+            if (isChecked) {
+              this.currentStep++;
+              this.updateForm();
+            }
+          }
+          else if (this.currentStep === 2){
+            const bags = active.querySelector('[name="bags"]')
+            if (bags.value !== '' && parseInt(bags.value) !== 0){
+              this.currentStep++;
+              this.updateForm();
+            }
+          }
+          else if (this.currentStep === 3){
+            const organizations = active.querySelectorAll('[name="organization"]')
+            const isChecked = Array.from(organizations).some(organization => organization.checked)
+            if (isChecked){
+              this.currentStep++;
+              this.updateForm();
+            }
+          }
+          else if (this.currentStep === 4){
+            const inputs = active.querySelectorAll('input')
+            let validator = 0
+            inputs.forEach(function (e){
+              if (e.value === ''){
+                validator = 0
+              }
+              else {
+                validator = 1
+              }})
+            if (validator === 1){
+              this.currentStep++;
+              this.updateForm();
+            }
+          }
         });
       });
 
@@ -221,8 +258,6 @@ document.addEventListener("DOMContentLoaded", function() {
     updateForm() {
       this.$step.innerText = this.currentStep;
 
-      // TODO: Validation
-
       this.slides.forEach(slide => {
         slide.classList.remove("active");
 
@@ -234,7 +269,44 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
-      // TODO: get data from inputs and show them in summary
+      const summary = document.querySelector('.summary')
+      const summary_first = summary.querySelectorAll('.summary--text')
+
+      if (this.currentStep === 5){
+        const form = this.$form.querySelector("form")
+        const formData = new FormData(form)
+        for (const item of formData){
+          if (item[0] === 'more_info'){
+            if (item[1] !== ''){
+              summary.querySelector('#more_info').innerText = item[1]
+            }
+          }
+          if (item[1] !== '')
+            if (item[0] === 'bags') {
+              summary_first[0].innerHTML = item[1] + ' worków do oddania';
+            }
+            else if (item[0] === 'organization') {
+              summary_first[1].innerHTML = 'Dla ' + item[1];
+            }
+            else if (item[0] === 'address') {
+              summary.querySelector('#address').innerText = item[1]
+            }
+            else if (item[0] === 'city') {
+              summary.querySelector('#city').innerText = item[1]
+            }
+            else if (item[0] === 'postcode') {
+              summary.querySelector('#postcode').innerText = item[1]
+            }
+            else if (item[0] === 'phone') {
+              summary.querySelector('#phone').innerText = item[1]
+            }
+            else if (item[0] === 'date') {
+              summary.querySelector('#date').innerText = item[1]
+            }
+            else if (item[0] === 'time') {
+              summary.querySelector('#time').innerText = item[1]
+            }
+        }}
     }
 
     /**
@@ -243,11 +315,23 @@ document.addEventListener("DOMContentLoaded", function() {
      * TODO: validation, send data to server
      */
     submit(e) {
-      if (this.currentStep < 5) {
         e.preventDefault();
-        this.currentStep++;
-        this.updateForm();
-      }
+        const formData = new FormData(this.$form.querySelector('form'))
+        const data = new URLSearchParams(formData)
+        fetch('/form/', {
+          method: "POST",
+          body: data
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok')
+          }
+          return response;
+        })
+        .then(() => {
+          return window.location.href = '/donation-confirm/'
+        })
+        .catch(error => console.error("Error:", error))
     }
   }
   const form = document.querySelector(".form--steps");
@@ -258,134 +342,134 @@ document.addEventListener("DOMContentLoaded", function() {
 const checkboxesTaken = Array.from(document.getElementsByClassName('archive-checkbox'))
 const archiveCheckboxSwitch = document.getElementById('archive')
 
-  archiveCheckboxSwitch.addEventListener('change', function (){
-  if (archiveCheckboxSwitch.checked){
-    checkboxesTaken.forEach(e => {
-      e.style.display = 'block'
+  if (archiveCheckboxSwitch) {
+    archiveCheckboxSwitch.addEventListener('change', function () {
+      if (archiveCheckboxSwitch.checked) {
+        checkboxesTaken.forEach(e => {
+          e.style.display = 'block'
+        })
+      } else {
+        checkboxesTaken.forEach(e => {
+          e.style.display = 'none'
+        })
+      }
     })
   }
-  else{
-    checkboxesTaken.forEach(e => {
-      e.style.display = 'none'
-    })
-  }
-})
-
 });
-
-const donationForm = document.getElementById('donationForm')
-const step4NextButton = document.getElementById('summaryButton')
-
-step4NextButton.addEventListener("click", (e) => {
-  e.preventDefault()
-  const formData = new FormData(donationForm);
-
-  const bagsSum = document.getElementById('bagsSum')
-  const organizationSum = document.getElementById('organizationSum')
-  const addressSum = document.getElementById('addressSum')
-  const citySum = document.getElementById('citySum')
-  const postcodeSum = document.getElementById('postcodeSum')
-  const phoneSum = document.getElementById('phoneSum')
-  const dateSum = document.getElementById('dateSum')
-  const timeSum = document.getElementById('timeSum')
-  const commentSum = document.getElementById('commentSum')
-  const formFields = [bagsSum, organizationSum, addressSum, citySum, postcodeSum, phoneSum, dateSum, timeSum, commentSum]
-
-
-  for (item of formData) {
-    // console.log(item[0])
-    formFields.forEach(e => {
-      // console.log(e.id);
-      if (item[0] === e.id) {
-        if (item[0] === 'bagsSum') {
-          e.innerHTML = item[1] + ' worków';
-          return;
-        }
-        if (item[0] === 'organizationSum'){
-          e.innerHTML = 'Dla ' + item[1];
-          return;
-        }
-        else {
-          if (item[1] !== '') {
-            e.innerText = item[1]
-          }
-        }
-      }
-    });
-  }
-})
-
-// STEP 1
-const checkbox1 = Array.from(document.getElementsByClassName('checkbox1'))
-const button1 = document.getElementById('button1')
-let counter = 0
-
-checkbox1.forEach(e => {
-  e.addEventListener('change', function (){
-    if (e.checked){
-      counter += 1
-      if (counter > 0){
-        button1.style['display'] = 'block'
-      }
-    }
-    else {
-      counter -= 1
-      if (counter === 0){
-        button1.style['display'] = 'none'
-      }
-    }
-  })
-})
-
-// STEP 2
-
-const inputBags = document.getElementById('bagsInput')
-const button2 = document.getElementById('button2')
-
-inputBags.addEventListener('input', function (){
-  if (inputBags.value !== '' && parseInt(inputBags.value) !== 0){
-    button2.style['display'] = 'block'
-  }
-  else{
-    button2.style['display'] = 'none'
-  }
-})
-
-// STEP 3
-
-const checkbox2 = Array.from(document.getElementsByClassName('checkbox2'))
-const button3 = document.getElementById('button3')
-
-checkbox2.forEach(e => {
-  e.addEventListener('change', function (){
-    if (e.checked){
-        button3.style['display'] = 'block'
-      }
-    }
-  )})
-
-// STEP 4
-
-const button4 = document.getElementById('summaryButton')
-
-const address = document.querySelector('[name="addressSum"]')
-const city = document.querySelector('[name="citySum"]')
-const postcode = document.querySelector('[name="postcodeSum"]')
-const phone = document.querySelector('[name="phoneSum"]')
-const date = document.querySelector('[name="dateSum"]')
-const time = document.querySelector('[name="timeSum"]')
-
-const fields = [address, city, postcode, phone, date, time]
-
-fields.forEach(function (e){
-  e.addEventListener('change', function (){
-    const allFilled = fields.every(f => f.value.trim() !== '')
-
-    if (allFilled) {
-      button4.style.display = 'block'
-    }
-    else {
-      button4.style.display = 'none'
-    }
-  })
-})
+//
+// const donationForm = document.getElementById('donationForm')
+// const step4NextButton = document.getElementById('summaryButton')
+//
+// step4NextButton.addEventListener("click", (e) => {
+//   e.preventDefault()
+//   const formData = new FormData(donationForm);
+//
+//   const bagsSum = document.getElementById('bagsSum')
+//   const organizationSum = document.getElementById('organizationSum')
+//   const addressSum = document.getElementById('addressSum')
+//   const citySum = document.getElementById('citySum')
+//   const postcodeSum = document.getElementById('postcodeSum')
+//   const phoneSum = document.getElementById('phoneSum')
+//   const dateSum = document.getElementById('dateSum')
+//   const timeSum = document.getElementById('timeSum')
+//   const commentSum = document.getElementById('commentSum')
+//   const formFields = [bagsSum, organizationSum, addressSum, citySum, postcodeSum, phoneSum, dateSum, timeSum, commentSum]
+//
+//
+//   for (item of formData) {
+//     // console.log(item[0])
+//     formFields.forEach(e => {
+//       // console.log(e.id);
+//       if (item[0] === e.id) {
+//         if (item[0] === 'bagsSum') {
+//           e.innerHTML = item[1] + ' worków';
+//           return;
+//         }
+//         if (item[0] === 'organizationSum'){
+//           e.innerHTML = 'Dla ' + item[1];
+//           return;
+//         }
+//         else {
+//           if (item[1] !== '') {
+//             e.innerText = item[1]
+//           }
+//         }
+//       }
+//     });
+//   }
+// })
+//
+// // STEP 1
+// const checkbox1 = Array.from(document.getElementsByClassName('checkbox1'))
+// const button1 = document.getElementById('button1')
+// let counter = 0
+//
+// checkbox1.forEach(e => {
+//   e.addEventListener('change', function (){
+//     if (e.checked){
+//       counter += 1
+//       if (counter > 0){
+//         button1.style['display'] = 'block'
+//       }
+//     }
+//     else {
+//       counter -= 1
+//       if (counter === 0){
+//         button1.style['display'] = 'none'
+//       }
+//     }
+//   })
+// })
+//
+// // STEP 2
+//
+// const inputBags = document.getElementById('bagsInput')
+// const button2 = document.getElementById('button2')
+//
+// inputBags.addEventListener('input', function (){
+//   if (inputBags.value !== '' && parseInt(inputBags.value) !== 0){
+//     button2.style['display'] = 'block'
+//   }
+//   else{
+//     button2.style['display'] = 'none'
+//   }
+// })
+//
+// // STEP 3
+//
+// const checkbox2 = Array.from(document.getElementsByClassName('checkbox2'))
+// const button3 = document.getElementById('button3')
+//
+// checkbox2.forEach(e => {
+//   e.addEventListener('change', function (){
+//     if (e.checked){
+//         button3.style['display'] = 'block'
+//       }
+//     }
+//   )})
+//
+// // STEP 4
+//
+// const button4 = document.getElementById('summaryButton')
+//
+// const address = document.querySelector('[name="addressSum"]')
+// const city = document.querySelector('[name="citySum"]')
+// const postcode = document.querySelector('[name="postcodeSum"]')
+// const phone = document.querySelector('[name="phoneSum"]')
+// const date = document.querySelector('[name="dateSum"]')
+// const time = document.querySelector('[name="timeSum"]')
+//
+// const fields = [address, city, postcode, phone, date, time]
+//
+// fields.forEach(function (e){
+//   e.addEventListener('change', function (){
+//     const allFilled = fields.every(f => f.value.trim() !== '')
+//
+//     if (allFilled) {
+//       button4.style.display = 'block'
+//     }
+//     else {
+//       button4.style.display = 'none'
+//     }
+//   })
+// })

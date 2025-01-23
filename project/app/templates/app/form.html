@@ -56,22 +56,21 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="" method="post" id="donationForm">
-        {% csrf_token %}
+        <form action="" method="post">
           <!-- STEP 1: class .active is switching steps -->
           <div data-step="1" class="active">
             <h3>Zaznacz co chcesz oddać:</h3>
             {% for category in categories %}
             <div class="form-group form-group--checkbox">
               <label>
-                <input class="checkbox1" type="checkbox" name="categories" value="{{ category.pk }}"/>
+                <input type="checkbox" name="categories" value="{{ category.pk }}"/>
                 <span class="checkbox"></span>
                 <span class="description">{{ category.name }}</span>
               </label>
             </div>
             {% endfor %}
             <div class="form-group form-group--buttons">
-              <button id="button1" style="display: none" type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step">Dalej</button>
             </div>
           </div>
 
@@ -82,13 +81,13 @@
             <div class="form-group form-group--inline">
               <label>
                 Liczba 60l worków:
-                <input id="bagsInput" type="number" name="bagsSum" step="1" min="1" />
+                <input type="number" name="bags" step="1" min="1" />
               </label>
             </div>
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button id="button2" style="display: none" type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step">Dalej</button>
             </div>
           </div>
 
@@ -100,7 +99,7 @@
             {% for institution in institutions %}
             <div class="form-group form-group--checkbox">
               <label>
-                <input class="checkbox2" type="radio" name="organizationSum" value='{{ institution.get_type_display }} "{{ institution.name }}"'/>
+                <input type="radio" name="organization" value='{{ institution.get_type_display }} "{{ institution.name }}"'/>
                 <span class="checkbox radio"></span>
                 <span class="description">
                   <div class="title">{{ institution.get_type_display }} “{{ institution.name }}”</div>
@@ -111,7 +110,7 @@
             {% endfor %}
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button id="button3" style="display: none" type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step">Dalej</button>
             </div>
           </div>
 
@@ -123,22 +122,22 @@
               <div class="form-section--column">
                 <h4>Adres odbioru</h4>
                 <div class="form-group form-group--inline">
-                  <label> Ulica <input type="text" name="addressSum" /> </label>
+                  <label> Ulica <input type="text" name="address" /> </label>
                 </div>
 
                 <div class="form-group form-group--inline">
-                  <label> Miasto <input type="text" name="citySum" /> </label>
+                  <label> Miasto <input type="text" name="city" /> </label>
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
-                    Kod pocztowy <input type="text" name="postcodeSum" />
+                    Kod pocztowy <input type="text" name="postcode" />
                   </label>
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
-                    Numer telefonu <input type="phone" name="phoneSum" />
+                    Numer telefonu <input type="phone" name="phone" />
                   </label>
                 </div>
               </div>
@@ -146,24 +145,24 @@
               <div class="form-section--column">
                 <h4>Termin odbioru</h4>
                 <div class="form-group form-group--inline">
-                  <label> Data <input type="date" name="dateSum" /> </label>
+                  <label> Data <input type="date" name="date" /> </label>
                 </div>
 
                 <div class="form-group form-group--inline">
-                  <label> Godzina <input type="time" name="timeSum" /> </label>
+                  <label> Godzina <input type="time" name="time" /> </label>
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
                     Uwagi dla kuriera
-                    <textarea name="commentSum" rows="5"></textarea>
+                    <textarea name="more_info" rows="5"></textarea>
                   </label>
                 </div>
               </div>
             </div>
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button id="summaryButton" style="display: none" type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step">Dalej</button>
             </div>
           </div>
 
@@ -177,12 +176,12 @@
                 <ul>
                   <li>
                     <span class="icon icon-bag"></span>
-                    <span id="bagsSum" class="summary--text"></span>
+                    <span class="summary--text">4 worki ubrań w dobrym stanie dla dzieci</span>
                   </li>
 
                   <li>
                     <span class="icon icon-hand"></span>
-                    <span id="organizationSum" class="summary--text"></span>
+                    <span class="summary--text">Dla fundacji "Mam marzenie" w Warszawie</span>
                   </li>
                 </ul>
               </div>
@@ -191,19 +190,19 @@
                 <div class="form-section--column">
                   <h4>Adres odbioru:</h4>
                   <ul>
-                    <li id="addressSum"></li>
-                    <li id="citySum"></li>
-                    <li id="postcodeSum"></li>
-                    <li id="phoneSum"></li>
+                    <li id="address"></li>
+                    <li id="city"></li>
+                    <li id="postcode"></li>
+                    <li id="phone"></li>
                   </ul>
                 </div>
 
                 <div class="form-section--column">
                   <h4>Termin odbioru:</h4>
                   <ul>
-                    <li id="dateSum"></li>
-                    <li id="timeSum"></li>
-                    <li id="commentSum">Brak uwag</li>
+                    <li id="date"></li>
+                    <li id="time"></li>
+                    <li id="more_info">Brak uwag</li>
                   </ul>
                 </div>
               </div>
