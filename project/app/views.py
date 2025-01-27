@@ -41,39 +41,6 @@ class AddDonationView(LoginRequiredMixin, View):
         }
         return render(request, 'app/form.html', ctx)
 
-    # def post(self, request):
-    #     bags = request.POST['bagsSum']
-    #     raw_categories = request.POST.getlist('categories')
-    #     raw_institution = request.POST['organizationSum']
-    #     address = request.POST['addressSum']
-    #     phone_number = request.POST['phoneSum']
-    #     city = request.POST['citySum']
-    #     zip_code = request.POST['postcodeSum']
-    #     pick_up_date = request.POST['dateSum']
-    #     pick_up_time = request.POST['timeSum']
-    #     pick_up_comment = request.POST['commentSum']
-    #     user = self.request.user
-    #
-    #     categories = [Category.objects.get(pk=i) for i in raw_categories]
-    #
-    #     match = re.search(r'"(.*?)"', raw_institution)
-    #     institution = Institution.objects.get(name=match.group(1))
-    #
-    #     donation = Donation.objects.create(
-    #         quantity=bags,
-    #         institution=institution,
-    #         address=address,
-    #         phone_number=phone_number,
-    #         city=city,
-    #         zip_code=zip_code,
-    #         pick_up_date=pick_up_date,
-    #         pick_up_time=pick_up_time,
-    #         pick_up_comment=pick_up_comment if pick_up_comment else None,
-    #         user=user,
-    #     )
-    #     donation.categories.set(categories)
-    #     return redirect('add-donation-confirm')
-
 
 class LoginView(View):
     def get(self, request):
@@ -124,7 +91,6 @@ class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'app/profile.html', {'donations': Donation.objects.filter(user=self.request.user).order_by('is_taken')})
 
-
     def post(self, request):
         donations_to_update = request.POST.getlist('not_taken')
         for i in donations_to_update:
@@ -137,7 +103,6 @@ class ProfileView(LoginRequiredMixin, View):
 class SettingsView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'app/settings.html')
-
 
     def post(self, request):
         if 'button1' in request.POST:
