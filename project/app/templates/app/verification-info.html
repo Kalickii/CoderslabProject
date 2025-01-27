@@ -1,0 +1,16 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block content %}
+{% block header %}
+    <header>
+        {{ block.super }}
+    </header>
+{% endblock %}
+    <label>
+        Link weryfikacyjny został wysłany na twój adres email. Proszę potwierdzić konto :)
+    </label>
+    <br>
+    <br>
+    <br>
+    <br>
+{% endblock %}

@@ -1,14 +1,16 @@
 import re
-from http.client import HTTPResponse
+
+from uuid import uuid4
 
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponse
+from django.core.mail import EmailMessage
 
 from app.models import Category, Donation, Institution, User
 
@@ -52,8 +54,10 @@ class LoginView(View):
         if email and password:
             user = authenticate(email=email, password=password)
             if user is not None:
-                login(request, user)
-                return redirect('landing-page')
+                if user.is_activated:
+                    login(request, user)
+                    return redirect('landing-page')
+                return render(request, 'app/register.html', {'message': "Konto nie zostało jeszcze aktywowane"})
             return redirect('register')
         return render(request, 'app/login.html')
 
@@ -70,10 +74,45 @@ class RegisterView(View):
         password2 = request.POST.get('password2')
         if name and surname and email and password and password2 and (password == password2) and (User.objects.filter(email=email).exists() is False):
             User.objects.create_user(first_name=name, last_name=surname, email=email, password=password)
-            return redirect('login')
+            request.session['email'] = email
+            return redirect('verification-info')
         else:
             message = 'Proszę wypełnić wszystkie pola, hasło musi być takie same oraz adres email może zostać użyty tylko raz.'
             return render(request, 'app/register.html', {'message': message})
+
+
+def verification_info(request):
+    if request.method == 'GET':
+        if 'email' in request.session:
+            from_address = "company@gmail.com"
+            to_address = request.session.get('email')
+            token = str(uuid4())
+            url = "http://127.0.0.1:8000/verification/"
+            activation_link = f"{url}?activate={token}"
+            content = "W celu aktywowania konta proszę kliknąć w poniższy link weryfikacyjny."
+            request.session['token'] = token
+
+            email = EmailMessage(
+                "Weryfikacja konta",
+                f"{content}\n{activation_link}",
+                from_email=from_address,
+                to=[to_address],
+            )
+            email.send()
+
+            return render(request, 'app/verification-info.html')
+        return redirect('register')
+
+
+def verification_activate(request):
+    if request.method == 'GET':
+        activate_token = request.GET.get('activate')
+        if activate_token == request.session.get('token') and request.session.get('email'):
+            get_user_model()
+            user = User.objects.get(email=request.session.get('email'))
+            user.is_activated = True
+            user.save()
+            return render(request, 'app/verified.html')
 
 
 @login_required(login_url='login')
@@ -84,7 +123,8 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def donation_confirm_view(request):
-    return render(request, 'app/form-confirmation.html')
+    if request.method == 'GET':
+        return render(request, 'app/form-confirmation.html')
 
 
 class ProfileView(LoginRequiredMixin, View):
